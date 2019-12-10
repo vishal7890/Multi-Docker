@@ -1,22 +1,20 @@
 sudo: required
-
 services:
-	- docker
-
+  - docker
 before_install:
-    - docker build -t lala7890/react-test -f ./client/Dockerfile.dev ./client
-
-
+  - docker build -t lala7890/react-test -f ./client/Dockerfile.dev ./client
 script:
-	- docker run lala7890/react-test npm test -- --coverage
+  - docker run lala7890/react-test npm test -- --coverage
+after_sucess:
+  - docker build -t lala7890/multi-client ./client
+  - docker build -t lala7890/multi-nginx ./nginx
+  - docker build -t lala7890/multi-server ./server
+  - docker build -t lala7890/multi-worker ./worker
 
-after_success:
-	- docker build -t lala7890/multi-client ./client
-	- docker build -t lala7890/multi-nginix ./nginix
-	- docker build -t lala7890/multi-server ./server 
-	- docker build -t lala7890/multi-worker ./worker  
-    - echo "$docker_password" | docker_login -u "docker_id" --password-stdin
-    - docker push lala7890/multi-client
-    - docker push lala7890/multi-nginix
-    - docker push lala7890/multi-server
-    - docker push lala7890/multi-worker
+  #login to docker cli
+  - echo "$docker_password" | docker login -u "$docker_id" --password-stdin
+  #take those images and push them to docker hub
+  - docker push lala7890/multi-client
+  - docker push lala7890/multi-nginx
+  - docker push lala7890/multi-server
+  - docker push lala7890/multi-worker
